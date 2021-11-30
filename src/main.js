@@ -8,16 +8,19 @@ import {createStatisticFilterTemplate} from './view/statistic-filters-view';
 import {createUserProfileTemplate} from './view/user-profile-view';
 import {createUserRankTemplate} from './view/user-rank-view';
 
-const renderComponentTemplate = (container, template, targetPlace) => {
-  container.insertAdjacentHTML(targetPlace, template);
-};
-
 const renderPosition = {
   BEFOREBEGIN: 'beforebegin',
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
   AFTEREND: 'afterend',
 };
+
+const FILM_CARDS = 5;
+
+const renderComponentTemplate = (container, template, targetPlace) => {
+  container.insertAdjacentHTML(targetPlace, template);
+};
+
 
 const headerElement = document.querySelector('.header');
 renderComponentTemplate(headerElement, createUserProfileTemplate(), renderPosition.BEFOREEND);
@@ -28,14 +31,14 @@ renderComponentTemplate(siteMainElement, createNavigationTemplate(), renderPosit
 renderComponentTemplate(siteMainElement, createSortingTemplate(), renderPosition.BEFOREEND);
 
 renderComponentTemplate(siteMainElement, createStatisticFilterTemplate(), renderPosition.BEFOREEND);
+
 const userRankElement = siteMainElement.querySelector('.statistic');
 renderComponentTemplate(userRankElement, createUserRankTemplate(), renderPosition.AFTERBEGIN);
 
 renderComponentTemplate(siteMainElement, createFilmsTemplate(), renderPosition.BEFOREEND);
 
-const FILM_CARDS = 5;
 const filmsElement = siteMainElement.querySelector('.films-list__container');
-for (let i = 1; i <= FILM_CARDS; i++) {
+for (let i = 0; i < FILM_CARDS; i++) {
   renderComponentTemplate(filmsElement, createFilmCardTemplate(), renderPosition.BEFOREEND);
 }
 
