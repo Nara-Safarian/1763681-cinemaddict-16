@@ -21,7 +21,24 @@ const createComment = ({emotion, author, message, date}) => {
 };
 
 export const createFilmDetailsPopupTemplate = (filmCardPopup) => {
-  const {title, rating, originalTitle, director, writers, actors, releaseDate, runTime, country, genres, poster, description, ageRating, isInWatchlist, isWatched, isFavourite, comments} = filmCardPopup;
+  const {
+    title,
+    rating,
+    originalTitle,
+    director,
+    writers,
+    actors,
+    releaseDate,
+    runTime,
+    country,
+    genres,
+    poster,
+    description,
+    ageRating,
+    isInWatchlist,
+    isWatched,
+    isFavourite,
+    comments} = filmCardPopup;
   const formattedReleaseDate = dayjs(releaseDate).format('D MMMM YYYY');
 
   const addToWatchlist = isInWatchlist
