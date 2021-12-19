@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {createComponentElement} from '../render.js';
 
 const createComment = ({emotion, author, message, date}) => {
   const formattedDate = dayjs(date).format('YYYY/DD/MM HH:mm');
@@ -20,7 +21,7 @@ const createComment = ({emotion, author, message, date}) => {
   `;
 };
 
-export const createFilmDetailsPopupTemplate = (filmCardPopup) => {
+const createFilmDetailsPopupTemplate = (filmCardPopup) => {
   const {
     title,
     rating,
@@ -173,3 +174,28 @@ export const createFilmDetailsPopupTemplate = (filmCardPopup) => {
   </form>
 </section>`;
 };
+
+export default class FilmPopupView {
+  #element = null;
+  #filmCardPopup = null;
+
+  constructor(filmCardPopup) {
+    this.#filmCardPopup = filmCardPopup;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createComponentElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmDetailsPopupTemplate(this.#filmCardPopup);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
