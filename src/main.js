@@ -4,16 +4,13 @@ import FilmsMenuView from './view/films-template-view.js';
 import NavigationView from './view/navigation-view.js';
 import ShowMoreButtonView from './view/showmore-button-view.js';
 import SortingView from './view/sort-view.js';
-// import StatisticFilterView from './view/statistic-filters-view.js';
 import UserProfileView from './view/user-profile-view.js';
-// import UserRankView from './view/user-rank-view.js';
 import FooterStatisticsView from './view/footer.js';
 import {generateFilmCard} from './mock/film-card.js';
 import {FILM_CARDS, FILM_CARDS_PER_STEP} from './consts.js';
 import {generateFilter} from './mock/filter.js';
 import {RenderPosition, render} from './render.js';
 import FilmsListView from './view/films-list-view.js';
-// import statisticsContainerView from './view/statistics-container-view.js';
 import FilmListContainerView from './view/film-list-container-view';
 
 const filmCards = Array.from({length: FILM_CARDS}, generateFilmCard);
@@ -47,12 +44,6 @@ const siteMainElement = document.querySelector('.main');
 render(siteMainElement, new NavigationView(filters).element, RenderPosition.AFTERBEGIN);
 
 render(siteMainElement, new SortingView().element, RenderPosition.BEFOREEND);
-
-// const statisticsContainerElement = new statisticsContainerView();
-// render(siteMainElement, statisticsContainerElement.element, RenderPosition.BEFOREEND);
-// render(statisticsContainerElement.element, new UserRankView().element, RenderPosition.AFTERBEGIN);
-
-// render(statisticsContainerElement.element, new StatisticFilterView().element, RenderPosition.BEFOREEND);
 
 const filmsMenuContainer = new FilmsMenuView();
 render(siteMainElement, filmsMenuContainer.element, RenderPosition.BEFOREEND);
