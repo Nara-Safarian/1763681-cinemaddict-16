@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
+import {createComponentElement} from '../render.js';
 
-export const createFilmCardTemplate = (filmCard) => {
+const createFilmCardTemplate = (filmCard) => {
   const {
     title,
     rating,
@@ -49,3 +50,27 @@ export const createFilmCardTemplate = (filmCard) => {
   </article>`;
 };
 
+export default class FilmCardView {
+  #element = null;
+  #filmCard = null;
+
+  constructor(filmCard) {
+    this.#filmCard = filmCard;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createComponentElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmCardTemplate(this.#filmCard);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
