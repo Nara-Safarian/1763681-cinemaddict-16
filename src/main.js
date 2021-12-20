@@ -12,25 +12,38 @@ import {generateFilter} from './mock/filter.js';
 import {RenderPosition, render} from './render.js';
 import FilmsListView from './view/films-list-view.js';
 import FilmListContainerView from './view/film-list-container-view';
+import NoFilmView from './view/no-films.js';
+import {onEscKeyDown} from './utils';
 
 const filmCards = Array.from({length: FILM_CARDS}, generateFilmCard);
 const filters = generateFilter(filmCards);
 
-const renderFilmCards = (filmListElement, filmCard, mainElement) => {
+const renderPopup = (filmListElement, filmCard, mainElement) => {
   const filmComponent = new FilmCardView(filmCard);
   const filmPopupComponent = new FilmPopupView(filmCard);
 
-  const appendPopup = () => {
+  const replaceFilmCardToPopup = () => {
     mainElement.appendChild(filmPopupComponent.element);
   };
 
+  const replacePopupToFilmCard = () => {
+    mainElement.removeChild(filmPopupComponent.element);
+  };
+
+  const onKeyDownDocument = (evt) => {
+    onEscKeyDown(evt, mainElement, filmPopupComponent.element);
+    document.removeEventListener('keydown', onKeyDownDocument);
+    document.body.classList.remove('hide-overflow');
+  };
+
   filmComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-    appendPopup();
+    replaceFilmCardToPopup();
     document.body.classList.add('hide-overflow');
+    document.addEventListener('keydown', onKeyDownDocument);
   });
 
   filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-    mainElement.removeChild(filmPopupComponent.element);
+    replacePopupToFilmCard();
     document.body.classList.remove('hide-overflow');
   });
 
@@ -51,32 +64,40 @@ render(siteMainElement, filmsMenuContainer.element, RenderPosition.BEFOREEND);
 const filmsListComponent = new FilmsListView();
 render(filmsMenuContainer.element, filmsListComponent.element, RenderPosition.BEFOREEND);
 
-const filmsElement = new FilmListContainerView();
-render(filmsListComponent.element, filmsElement.element, RenderPosition.BEFOREEND);
+const renderFilmCard = () => {
 
-for (let i = 0; i < Math.min(filmCards.length, FILM_CARDS_PER_STEP); i++) {
-  renderFilmCards(filmsElement.element, filmCards[i], siteMainElement);
-}
+  const filmsElement = new FilmListContainerView();
+  render(filmsListComponent.element, filmsElement.element, RenderPosition.BEFOREEND);
+
+  if (filmCards.length === 0) {
+    const noFilmComponent = new NoFilmView();
+    render(filmsMenuContainer.element, noFilmComponent.element, RenderPosition.BEFOREEND);
+  } else {
+    for (let i = 0; i < Math.min(filmCards.length, FILM_CARDS_PER_STEP); i++) {
+      renderPopup(filmsElement.element, filmCards[i], siteMainElement);
+    }
+
+    const showMoreButton = new ShowMoreButtonView();
+
+    if (filmCards.length > FILM_CARDS_PER_STEP) {
+      let renderedFilmCount = FILM_CARDS_PER_STEP;
+      render(filmsListComponent.element, showMoreButton.element, RenderPosition.BEFOREEND);
+
+      showMoreButton.element.addEventListener('click', () => {
+        filmCards
+          .slice(renderedFilmCount, renderedFilmCount + FILM_CARDS_PER_STEP)
+          .forEach((filmCard) => renderPopup(filmsElement.element, filmCard, siteMainElement));
+
+        renderedFilmCount += FILM_CARDS_PER_STEP;
+
+        if (renderedFilmCount >= filmCards.length) {
+          showMoreButton.element.remove();
+        }
+      });
+    }
+  }
+};
 
 render(siteMainElement, new FooterStatisticsView(filmCards.length).element, RenderPosition.AFTEREND);
 
-const showMoreButton = new ShowMoreButtonView();
-
-if (filmCards.length > FILM_CARDS_PER_STEP) {
-  let renderedFilmCount = FILM_CARDS_PER_STEP;
-  render(filmsListComponent.element, showMoreButton.element, RenderPosition.BEFOREEND);
-
-  showMoreButton.element.addEventListener('click', () => {
-    filmCards
-      .slice(renderedFilmCount, renderedFilmCount + FILM_CARDS_PER_STEP)
-      .forEach((filmCard) => renderFilmCards(filmsElement.element, filmCard, siteMainElement));
-
-    renderedFilmCount += FILM_CARDS_PER_STEP;
-
-    if (renderedFilmCount >= filmCards.length) {
-      showMoreButton.element.remove();
-    }
-
-  });
-}
-
+renderFilmCard();
