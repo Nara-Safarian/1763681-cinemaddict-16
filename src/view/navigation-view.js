@@ -1,4 +1,4 @@
-import {createComponentElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createFilter = (name, count, isActive) => `
     <a href="#${name}" class="main-navigation__item ${isActive ? 'main-navigation__item--active' : ''}">
@@ -21,27 +21,15 @@ const createNavigationNavigationTemplate = (filters) => {
   );
 };
 
-export default class NavigationView {
-  #element = null;
+export default class NavigationView extends AbstractView {
   #filters = null;
 
   constructor(filters) {
+    super();
     this.#filters = filters;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createComponentElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createNavigationNavigationTemplate(this.#filters);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

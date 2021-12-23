@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {createComponentElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createComment = ({emotion, author, message, date}) => {
   const formattedDate = dayjs(date).format('YYYY/DD/MM HH:mm');
@@ -175,27 +175,25 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
 </section>`;
 };
 
-export default class FilmPopupView {
-  #element = null;
+export default class FilmPopupView extends AbstractView {
   #filmCardPopup = null;
 
   constructor(filmCardPopup) {
+    super();
     this.#filmCardPopup = filmCardPopup;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createComponentElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFilmDetailsPopupTemplate(this.#filmCardPopup);
   }
 
-  removeElement() {
-    this.#element = null;
+  setReplacePopupToFilmCard = (callback) => {
+    this._callback.replacePopup = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#replaceToFilmCard);
+  }
+
+  #replaceToFilmCard = (evt) => {
+    evt.preventDefault();
+    this._callback.replacePopup();
   }
 }

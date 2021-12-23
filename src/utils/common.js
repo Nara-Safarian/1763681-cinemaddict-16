@@ -10,11 +10,3 @@ export const getRandomFloat = (min, max) => {
   return Math.round(randomDigit * 10) / 10;
 };
 
-export const isEscapeKey = (evt) => evt.key === 'Escape';
-
-export const onEscKeyDown = (evt, parent, child) => {
-  if ((evt.key === 'Escape' || evt.key === 'Esc')) {
-    evt.preventDefault();
-    parent.removeChild(child);
-  }
-};
