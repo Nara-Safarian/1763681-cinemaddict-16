@@ -7,6 +7,7 @@ import FilmListContainerView from '../view/film-list-container-view';
 import {RenderPosition, render, remove} from '../utils/render.js';
 import {FILM_CARDS_PER_STEP} from '../consts.js';
 import FilmPresenter from './film-presenter.js';
+import {updateItem} from '../utils/common.js';
 
 export default class FilmListPresenter {
   #mainContainer = null;
@@ -20,6 +21,7 @@ export default class FilmListPresenter {
 
   #filmCardsList = [];
   #renderFilmCardsPerStep = FILM_CARDS_PER_STEP;
+  #filmPresenter = new Map();
 
   constructor(mainContainer) {
     this.#mainContainer = mainContainer;
@@ -32,6 +34,15 @@ export default class FilmListPresenter {
     this.#renderFilmsMenu();
     this.#renderFilmListTitle();
     this.#renderFilmCard();
+  }
+
+  #handlePopupModeChange = () => {
+    this.#filmPresenter.forEach((filmCard) => filmCard.resetView());
+  }
+
+  #handleCardsChange = (updatedCard) => {
+    this.#filmCardsList = updateItem(this.#filmCardsList, updatedCard);
+    this.#filmPresenter.get(updatedCard.id).init(updatedCard);
   }
 
   #renderMenuSorting = () => {
@@ -50,9 +61,10 @@ export default class FilmListPresenter {
     render(this.#filmsListTitleComponent, this.#filmsListContainer, RenderPosition.BEFOREEND);
   }
 
-  #renderPopup =  (filmListElement, filmCard, mainElement) => {
-    const filmPresenter = new FilmPresenter(mainElement);
-    filmPresenter.init(filmListElement, filmCard);
+  #renderPopup = (filmListElement, filmCard, mainElement) => {
+    const filmPresenter = new FilmPresenter(mainElement, filmListElement, this.#handleCardsChange, this.#handlePopupModeChange);
+    filmPresenter.init(filmCard);
+    this.#filmPresenter.set(filmCard.id, filmPresenter);
   }
 
   #renderFilmCard = () => {
@@ -94,5 +106,12 @@ export default class FilmListPresenter {
       render(this.#filmsListTitleComponent, this.#showMoreButtonComponent, RenderPosition.BEFOREEND);
       this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
     }
+  }
+
+  clearFilmCardsList = () => {
+    this.#filmPresenter.forEach((presenter) => presenter.destroy());
+    this.#filmPresenter.clear();
+    this.#renderFilmCardsPerStep = FILM_CARDS_PER_STEP;
+    remove(this.#showMoreButtonComponent);
   }
 }
