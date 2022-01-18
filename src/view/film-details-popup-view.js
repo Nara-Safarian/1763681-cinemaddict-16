@@ -40,6 +40,7 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
     isWatched,
     isFavourite,
     comments} = filmCardPopup;
+
   const formattedReleaseDate = dayjs(releaseDate).format('D MMMM YYYY');
 
   const addToWatchlist = isInWatchlist
