@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import {getRandomInteger, getRandomFloat} from '../utils/common.js';
+import {nanoid} from 'nanoid';
 
 const generatePoster = () => {
   const poster = [
@@ -175,6 +176,7 @@ const generateCommentMessage = () => {
 };
 
 const generateComment = () => ({
+  id: nanoid(),
   emotion: generateCommentEmotion(),
   date: generateCommentDate(),
   author: generateCommentAuthor(),
@@ -216,6 +218,7 @@ const generateDescription = () => {
 
 
 export const generateFilmCard = () => ({
+  id: nanoid(),
   poster: generatePoster(),
   rating: generateRating(),
   title: generateTitle(),
