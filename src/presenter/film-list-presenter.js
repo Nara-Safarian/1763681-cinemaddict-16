@@ -20,7 +20,7 @@ export default class FilmListPresenter {
   #showMoreButtonComponent = new ShowMoreButtonView();
 
   #filmCardsList = [];
-  #renderFilmCardsPerStep = FILM_CARDS_PER_STEP;
+  #renderedFilmCardCount = FILM_CARDS_PER_STEP;
   #filmPresenter = new Map();
 
   constructor(mainContainer) {
@@ -33,7 +33,7 @@ export default class FilmListPresenter {
     this.#renderMenuSorting();
     this.#renderFilmsMenu();
     this.#renderFilmListTitle();
-    this.#renderFilmCard();
+    this.#addFirstFilmCards();
   }
 
   #handlePopupModeChange = () => {
@@ -61,48 +61,48 @@ export default class FilmListPresenter {
     render(this.#filmsListTitleComponent, this.#filmsListContainer, RenderPosition.BEFOREEND);
   }
 
-  #renderPopup = (filmListElement, filmCard, mainElement) => {
+  #renderFilmCard = (filmListElement, filmCard, mainElement) => {
     const filmPresenter = new FilmPresenter(mainElement, filmListElement, this.#handleCardsChange, this.#handlePopupModeChange);
     filmPresenter.init(filmCard);
     this.#filmPresenter.set(filmCard.id, filmPresenter);
   }
 
-  #renderFilmCard = () => {
+  #addFirstFilmCards = () => {
     this.#renderFilmsListContainer();
 
     if (this.#filmCardsList.length === 0) {
-      this.#renderNoFilms();
+      this.#renderEmptyView();
     } else {
       for (let i = 0, end = Math.min(this.#filmCardsList.length, FILM_CARDS_PER_STEP); i < end; i++) {
-        this.#renderPopup(this.#filmsListContainer, this.#filmCardsList[i], this.#mainContainer);
+        this.#renderFilmCard(this.#filmsListContainer, this.#filmCardsList[i], this.#mainContainer);
       }
 
       this.#renderShowMoreButton();
     }
   }
 
-  #renderFilmCards = (from, to) => {
+  #addMoreFilmCards = (from, to) => {
     this.#filmCardsList
       .slice(from, to)
-      .forEach((filmCard) => this.#renderPopup(this.#filmsListContainer, filmCard, this.#mainContainer));
+      .forEach((filmCard) => this.#renderFilmCard(this.#filmsListContainer, filmCard, this.#mainContainer));
   }
 
-  #renderNoFilms = () => {
+  #renderEmptyView = () => {
     render(this.#filmsMenuComponent, this.#noFilmComponent, RenderPosition.BEFOREEND);
   }
 
 
   #handleShowMoreButtonClick = () => {
-    this.#renderFilmCards(this.#renderFilmCardsPerStep, this.#renderFilmCardsPerStep + FILM_CARDS_PER_STEP);
-    this.#renderFilmCardsPerStep += FILM_CARDS_PER_STEP;
+    this.#addMoreFilmCards(this.#renderedFilmCardCount, this.#renderedFilmCardCount + FILM_CARDS_PER_STEP);
+    this.#renderedFilmCardCount += FILM_CARDS_PER_STEP;
 
-    if (this.#renderFilmCardsPerStep >= this.#filmCardsList.length) {
+    if (this.#renderedFilmCardCount >= this.#filmCardsList.length) {
       remove(this.#showMoreButtonComponent);
     }
   }
 
   #renderShowMoreButton = () => {
-    if (this.#filmCardsList.length > this.#renderFilmCardsPerStep) {
+    if (this.#filmCardsList.length > this.#renderedFilmCardCount) {
       render(this.#filmsListTitleComponent, this.#showMoreButtonComponent, RenderPosition.BEFOREEND);
       this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
     }
@@ -111,7 +111,7 @@ export default class FilmListPresenter {
   clearFilmCardsList = () => {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
-    this.#renderFilmCardsPerStep = FILM_CARDS_PER_STEP;
+    this.#renderedFilmCardCount = FILM_CARDS_PER_STEP;
     remove(this.#showMoreButtonComponent);
   }
 }
