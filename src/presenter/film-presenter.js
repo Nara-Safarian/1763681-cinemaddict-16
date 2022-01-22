@@ -99,6 +99,7 @@ export  default class FilmPresenter {
   }
 
   #handleReturnToFilmCards = () => {
+    this.#filmPopupComponent.reset(this.#filmCard);
     this.#mainElement.removeChild(this.#filmPopupComponent.element);
     document.removeEventListener('keydown', this.#onKeyDownDocument);
     document.body.classList.remove('hide-overflow');
@@ -111,6 +112,7 @@ export  default class FilmPresenter {
     }
 
     evt.preventDefault();
+    this.#filmPopupComponent.reset(this.#filmCard);
     this.#handleReturnToFilmCards();
   }
 }

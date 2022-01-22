@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import {getRandomInteger, getRandomFloat} from '../utils/common.js';
 import {nanoid} from 'nanoid';
 
@@ -92,20 +91,6 @@ const generateActors = () => {
   return actors[randomIndex];
 };
 
-export const generateReleaseDate = () => {
-  const maxDaysGap = 50000;
-  const daysGap = getRandomInteger(1, maxDaysGap);
-  return dayjs().add(-daysGap, 'day').toDate();
-};
-
-const generateRunTime = () => {
-  const hours = getRandomInteger(0, 4);
-  const minutes = getRandomInteger(1, 59);
-  let runTime = hours ? `${hours}h ` : '';
-  runTime += `${minutes}m`;
-  return runTime;
-};
-
 const generateCountry = () => {
   const country = [
     'USA',
@@ -145,12 +130,6 @@ const generateCommentEmotion = () => {
   return emotion[randomIndex];
 };
 
-const generateCommentDate = () => {
-  const maxDaysGap = 1000;
-  const daysGap = getRandomInteger(1, maxDaysGap);
-  return dayjs().add(-daysGap, 'day').toDate();
-};
-
 const generateCommentAuthor = () => {
   const author = [
     'John Doe',
@@ -178,7 +157,7 @@ const generateCommentMessage = () => {
 const generateComment = () => ({
   id: nanoid(),
   emotion: generateCommentEmotion(),
-  date: generateCommentDate(),
+  date: new Date(),
   author: generateCommentAuthor(),
   message: generateCommentMessage()
 });
@@ -226,8 +205,8 @@ export const generateFilmCard = () => ({
   director: generateDirector(),
   writers: generateWriters(),
   actors: generateActors(),
-  releaseDate: generateReleaseDate(),
-  runTime: generateRunTime(),
+  releaseDate: new Date(),
+  runTime: getRandomInteger(1, 399),
   country: generateCountry(),
   genres: generateGenres(),
   description: generateDescription(),
