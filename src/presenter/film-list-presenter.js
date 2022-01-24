@@ -8,6 +8,8 @@ import {RenderPosition, render, remove} from '../utils/render.js';
 import {FILM_CARDS_PER_STEP} from '../consts.js';
 import FilmPresenter from './film-presenter.js';
 import {updateItem} from '../utils/common.js';
+import {SortType} from '../consts.js';
+import {sortDate, sortRating} from '../utils/task.js';
 
 export default class FilmListPresenter {
   #mainContainer = null;
@@ -22,6 +24,8 @@ export default class FilmListPresenter {
   #filmCardsList = [];
   #renderedFilmCardCount = FILM_CARDS_PER_STEP;
   #filmPresenter = new Map();
+  #currentSortType = SortType.DEFAULT;
+  #sourcedFilmCardsList = [];
 
   constructor(mainContainer) {
     this.#mainContainer = mainContainer;
@@ -29,6 +33,7 @@ export default class FilmListPresenter {
 
   init = (filmCardsList) => {
     this.#filmCardsList = [...filmCardsList];
+    this.#sourcedFilmCardsList = [...filmCardsList];
 
     this.#renderMenuSorting();
     this.#renderFilmsMenu();
@@ -42,11 +47,38 @@ export default class FilmListPresenter {
 
   #handleCardsChange = (updatedCard) => {
     this.#filmCardsList = updateItem(this.#filmCardsList, updatedCard);
+    this.#sourcedFilmCardsList = updateItem(this.#sourcedFilmCardsList, updatedCard);
     this.#filmPresenter.get(updatedCard.id).init(updatedCard);
+  }
+
+  #sortFilmCards = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#filmCardsList.sort(sortDate);
+        break;
+      case SortType.RATING:
+        this.#filmCardsList.sort(sortRating);
+        break;
+      default:
+        this.#filmCardsList = [...this.#sourcedFilmCardsList];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortFilmCards(sortType);
+    this.#clearFilmCardsList();
+    this.#addFirstFilmCards();
   }
 
   #renderMenuSorting = () => {
     render(this.#mainContainer, this.#sortMenuComponent, RenderPosition.AFTERBEGIN);
+    this.#sortMenuComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   }
 
   #renderFilmsMenu = () => {
@@ -108,7 +140,7 @@ export default class FilmListPresenter {
     }
   }
 
-  clearFilmCardsList = () => {
+  #clearFilmCardsList = () => {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
     this.#renderedFilmCardCount = FILM_CARDS_PER_STEP;
