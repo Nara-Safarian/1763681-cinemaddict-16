@@ -1,23 +1,33 @@
-import NavigationView from './view/navigation-view.js';
 import UserProfileView from './view/user-profile-view.js';
 import FooterStatisticsView from './view/footer.js';
-import {generateFilmCard} from './mock/film-card.js';
-import {FILM_CARDS} from './consts.js';
-import {generateFilter} from './mock/filter.js';
 import {RenderPosition, render} from './utils/render.js';
 import FilmListPresenter from './presenter/film-list-presenter.js';
+import FilmCardsModel from './model/films-model';
+import FilterModel from './model/filter-model.js';
+import IntervalModel from './model/interval-model.js';
+import NavigationFilterPresenter from './presenter/navigation-filter-presenter.js';
+import StatisticFilterPresenter from './presenter/statistic-filter-presenter.js';
+import ApiService from './api-service.js';
+import {getUserRank} from './utils/stats.js';
 
-const filmCards = Array.from({length: FILM_CARDS}, generateFilmCard);
-const filters = generateFilter(filmCards);
+const AUTHORIZATION = 'Basic igd8kbdf9sjdg5';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict/';
 
-const siteHeaderElement = document.querySelector('.header');
-render(siteHeaderElement, new UserProfileView(), RenderPosition.BEFOREEND);
+const filterModel = new FilterModel();
+const intervalModel = new IntervalModel();
+const filmCardsModel = new FilmCardsModel(new ApiService(END_POINT, AUTHORIZATION));
 
 const siteMainElement = document.querySelector('.main');
-render(siteMainElement, new NavigationView(filters), RenderPosition.AFTERBEGIN);
 
+const filmListPresenter = new FilmListPresenter(siteMainElement, filmCardsModel, filterModel);
+new NavigationFilterPresenter(siteMainElement, filterModel, filmCardsModel);
+new StatisticFilterPresenter(siteMainElement, intervalModel, filmCardsModel, filterModel);
 
-render(siteMainElement, new FooterStatisticsView(filmCards.length), RenderPosition.AFTEREND);
+filmListPresenter.init();
 
-const filmListPresenter = new FilmListPresenter(siteMainElement);
-filmListPresenter.init(filmCards);
+filmCardsModel.init().finally(() => {
+  const siteHeaderElement = document.querySelector('.header');
+  const rank = getUserRank(filmCardsModel.filmCards);
+  render(siteHeaderElement, new UserProfileView(rank), RenderPosition.BEFOREEND);
+  render(siteMainElement, new FooterStatisticsView(filmCardsModel.filmCards.length), RenderPosition.AFTEREND);
+});

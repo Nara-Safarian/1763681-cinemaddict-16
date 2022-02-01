@@ -1,11 +1,13 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
+dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 export const generateReleaseDate = (date) => dayjs(date).format('D MMMM YYYY');
 
-export const generateCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
+export const generateCommentDate = (date) => dayjs(date).fromNow();
 
 export const generateYear = (date) => dayjs(date).format('YYYY');
 
