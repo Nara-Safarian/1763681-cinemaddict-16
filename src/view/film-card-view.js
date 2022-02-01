@@ -17,7 +17,7 @@ const createFilmCardTemplate = (filmCard) => {
     isFavourite} = filmCard;
 
   const croppedDescription = description.length > COMMENT_LENGTH
-    ? `${description.slice(0, 139)}…`
+    ? `${description.slice(0, (COMMENT_LENGTH - 1))}…`
     : description;
 
   const addToWatchlist = isInWatchlist
