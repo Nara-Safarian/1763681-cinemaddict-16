@@ -1,10 +1,8 @@
-import dayjs from 'dayjs';
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
+import {EMOTIONS} from '../consts.js';
+import {generateCommentDate, generateReleaseDate, generateFormattedRuntime} from '../utils/date.js';
 
-const createComment = ({emotion, author, message, date}) => {
-  const formattedDate = dayjs(date).format('YYYY/DD/MM HH:mm');
-
-  return `
+const createComment = ({emotion, author, message, date}) => `
       <li class="film-details__comment">
         <span class="film-details__comment-emoji">
           <img src="./images/emoji/${emotion}" width="55" height="55" alt="emoji-smile">
@@ -13,13 +11,35 @@ const createComment = ({emotion, author, message, date}) => {
           <p class="film-details__comment-text">${message}</p>
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${author}</span>
-            <span class="film-details__comment-day">${formattedDate}</span>
+            <span class="film-details__comment-day">${generateCommentDate(date)}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
       </li>
   `;
-};
+
+const createEmotionsTemplate = (currentEmotion) => EMOTIONS.map((emotion) => `
+    <input
+      class="film-details__emoji-item visually-hidden"
+      name="comment-emoji"
+      type="radio"
+      id="emoji-${emotion}"
+      value="${emotion}"
+      ${currentEmotion === emotion ? 'checked' : ''}
+    >
+    <label
+      class="film-details__emoji-label"
+      for="emoji-${emotion}"
+      >
+        <img
+          src="./images/emoji/${emotion}.png"
+          width="30"
+          height="30"
+          alt="emoji"
+        >
+    </label>
+  `).join('');
+
 
 const createFilmDetailsPopupTemplate = (filmCardPopup) => {
   const {
@@ -39,9 +59,10 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
     isInWatchlist,
     isWatched,
     isFavourite,
-    comments} = filmCardPopup;
-
-  const formattedReleaseDate = dayjs(releaseDate).format('D MMMM YYYY');
+    message = 'Great movie!',
+    emotion = EMOTIONS[0],
+    comments
+  } = filmCardPopup;
 
   const addToWatchlist = isInWatchlist
     ? 'film-details__control-button--active'
@@ -58,6 +79,8 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
   const genresTitle = `Genre${genres.length > 0 ? 's' : ''}`;
 
   const commentsHtml = comments.map((comment) => createComment(comment));
+
+  const emotionsTemplate = createEmotionsTemplate(emotion);
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -99,11 +122,11 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${formattedReleaseDate}</td>
+              <td class="film-details__cell">${generateReleaseDate(releaseDate)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${runTime}</td>
+              <td class="film-details__cell">${generateFormattedRuntime(runTime)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -141,33 +164,15 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-            <img src="images/emoji/smile.png" width="55" height="55" alt="emoji-smile">
+            <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">Great movie!</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${message}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" checked>
-            <label class="film-details__emoji-label" for="emoji-smile">
-              <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-            <label class="film-details__emoji-label" for="emoji-sleeping">
-              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-            <label class="film-details__emoji-label" for="emoji-puke">
-              <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-            <label class="film-details__emoji-label" for="emoji-angry">
-              <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-            </label>
+            ${emotionsTemplate}
           </div>
         </div>
       </section>
@@ -176,16 +181,15 @@ const createFilmDetailsPopupTemplate = (filmCardPopup) => {
 </section>`;
 };
 
-export default class FilmPopupView extends AbstractView {
-  #filmCardPopup = null;
-
-  constructor(filmCardPopup) {
+export default class FilmPopupView extends SmartView {
+  constructor(filmCard) {
     super();
-    this.#filmCardPopup = filmCardPopup;
+    this._data = FilmPopupView.parseFilmCardToData(filmCard);
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmDetailsPopupTemplate(this.#filmCardPopup);
+    return createFilmDetailsPopupTemplate(this._data);
   }
 
   setReplacePopupToFilmCard = (callback) => {
@@ -195,7 +199,7 @@ export default class FilmPopupView extends AbstractView {
 
   #replaceToFilmCard = (evt) => {
     evt.preventDefault();
-    this._callback.replacePopup(this.filmCard);
+    this._callback.replacePopup();
   }
 
   setAddToWatchlistClickHandler = (callback) =>{
@@ -223,5 +227,60 @@ export default class FilmPopupView extends AbstractView {
 
   #favoriteClickHandler = () => {
     this._callback.addAddToFavouritesClick();
+  }
+
+  reset = (filmCard) => {
+    delete this._data.message;
+    delete this._data.emotion;
+    this.updateData(
+      FilmPopupView.parseFilmCardToData(filmCard)
+    );
+  }
+
+  restoreState = () => {
+    this.element.scrollTop = this._data.scrollTop || 0;
+    this.#restoreHandlers();
+  }
+
+  #restoreHandlers = () => {
+    this.#setInnerHandlers();
+
+    this.setReplacePopupToFilmCard(this._callback.replacePopup);
+    this.setAddToWatchlistClickHandler(this._callback.addToWatchlistClick);
+    this.setMarkAsWatchedClickHandler(this._callback.markAsWatchedClick);
+    this.setAddToFavouritesClickHandler(this._callback.addAddToFavouritesClick);
+  }
+
+  static parseFilmCardToData = (filmCard) => ({...filmCard})
+  static parseDataToFilmCard = (data) => ({...data})
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__comment-input')
+      .addEventListener('input', this.#messageInputHandler);
+
+    this.element.querySelector('.film-details__emoji-list')
+      .addEventListener('change', this.#emotionChangeHandler);
+
+    this.element.addEventListener('scroll', this.#popupScrollHandler);
+  }
+
+  #messageInputHandler = (evt) => {
+    evt.preventDefault();
+    this.updateData({
+      message: evt.target.value,
+    }, true);
+  }
+
+  #emotionChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.updateData({
+      emotion: evt.target.value,
+    });
+  }
+
+  #popupScrollHandler = () => {
+    this.updateData({
+      scrollTop: this.element.scrollTop,
+    }, true);
   }
 }
