@@ -1,11 +1,12 @@
 import AbstractView from './abstract-view.js';
 import {generateYear, generateFormattedRuntime} from '../utils/date.js';
+import {COMMENT_LENGTH} from '../consts.js';
 
 const createFilmCardTemplate = (filmCard) => {
   const {
     title,
     rating,
-    releaseYear,
+    releaseDate,
     runTime,
     genres,
     poster,
@@ -15,7 +16,7 @@ const createFilmCardTemplate = (filmCard) => {
     isWatched,
     isFavourite} = filmCard;
 
-  const croppedDescription = description.length > 140
+  const croppedDescription = description.length > COMMENT_LENGTH
     ? `${description.slice(0, 139)}…`
     : description;
 
@@ -36,11 +37,11 @@ const createFilmCardTemplate = (filmCard) => {
       <h3 class="film-card__title">${title}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${generateYear(releaseYear)}</span>
+        <span class="film-card__year">${generateYear(releaseDate)}</span>
         <span class="film-card__duration">${generateFormattedRuntime(runTime)}</span>
         <span class="film-card__genre">${genres[0]}</span>
       </p>
-      <img src="./images/posters/${poster}" alt="" class="film-card__poster">
+      <img src="./${poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${croppedDescription}</p>
       <span class="film-card__comments">${comments.length}</span>
     </a>
