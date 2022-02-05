@@ -1,4 +1,4 @@
-import StatisticFilterView from '../view/statistic-filters-view.js';
+import StatisticFilterView from '../view/statistic-filter-view.js';
 import UserRankView from '../view/user-rank-view.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {INTERVAL, UpdateType} from '../consts.js';

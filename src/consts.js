@@ -35,14 +35,6 @@ export const FilterType = {
   STATISTICS: 'statistics',
 };
 
-export const MenuNavigationItem = {
-  ALL_MOVIES: 'ALL_MOVIES',
-  WATCHLIST: 'WATCHLIST',
-  HISTORY: 'HISTORY',
-  FAVORITES:  'FAVORITES',
-  STATISTICS: 'STATISTICS',
-};
-
 export const GENRE = {
   'DRAMA': 'Drama',
   'THRILLER': 'Thriller',

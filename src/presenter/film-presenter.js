@@ -1,5 +1,5 @@
 import FilmCardView from '../view/film-card-view.js';
-import FilmPopupView from '../view/film-details-popup-view.js';
+import FilmPopupView from '../view/film-popup-view.js';
 import {RenderPosition, render, remove, replace} from '../utils/render.js';
 import {isEscapeKey} from '../utils/task.js';
 import {UserAction, UpdateType} from '../consts.js';

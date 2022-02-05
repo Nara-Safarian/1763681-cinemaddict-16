@@ -1,8 +1,8 @@
-import FilmsMenuView from '../view/films-template-view.js';
+import FilmsMenuView from '../view/films-menu-view.js';
 import FilmsListView from '../view/films-list-view.js';
-import SortingView from '../view/sort-view.js';
-import NoFilmView from '../view/no-films.js';
-import ShowMoreButtonView from '../view/showmore-button-view.js';
+import SortingView from '../view/sorting-view.js';
+import NoFilmView from '../view/no-films-view.js';
+import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilmListContainerView from '../view/film-list-container-view';
 import {RenderPosition, render, remove} from '../utils/render.js';
 import {FILM_CARDS_PER_STEP} from '../consts.js';

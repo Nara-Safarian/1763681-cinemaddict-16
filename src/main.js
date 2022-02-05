@@ -1,8 +1,8 @@
 import UserProfileView from './view/user-profile-view.js';
-import FooterStatisticsView from './view/footer.js';
+import FooterStatisticsView from './view/footer-statistics-view.js';
 import {RenderPosition, render} from './utils/render.js';
 import FilmListPresenter from './presenter/film-list-presenter.js';
-import FilmCardsModel from './model/films-model';
+import FilmCardsModel from './model/film-cards-model';
 import FilterModel from './model/filter-model.js';
 import IntervalModel from './model/interval-model.js';
 import NavigationFilterPresenter from './presenter/navigation-filter-presenter.js';
